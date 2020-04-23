@@ -54,3 +54,33 @@ ul.movie-list > li{
     display: block;
     font-size: 1rem;
 }
+
+/*The right column will be three times as big as the right.*/
+form#movie-database {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: auto auto;
+}
+/*We can make our search bar span both columns with grid-column-start and grid-column-end:*/
+#search {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    text-align: center;
+}
+/*Notice too that for CSS, we start counting at 1, not 0. The filters and the results will fall in the next row automatically, each taking up thier own respective grid cell. You can read more about the grid layout in A Complete Guide to Grid.
+
+Let’s go ahead and use flexbox to lay out our filters in a column:*/
+#filters {
+    display: flex;
+    flex-direction: column;
+}
+/*And make our number inputs smaller:*/
+
+
+#filters input[type=number] {
+    width: 3rem;
+}
+/*Also, let’s remove most of the margin below our <h4 > elements:*/
+#filters h4 {
+    margin-bottom: 0.2rem;
+}
