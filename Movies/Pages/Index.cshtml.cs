@@ -54,12 +54,36 @@ namespace Movies.Pages
         [BindProperty]
         public double? IMDBMax { get; set; }
 
-        public void OnGet(string SearchTerms, string[] MPAARatings, string[] Genre, double IMDBMin, double IMDBMax)
+        /// <summary>
+        /// The minimum Rotten Tomatoes Rating
+        /// </summary>
+        [BindProperty]
+        public double? RTMin { get; set; }
+
+        /// <summary>
+        /// The maximum Rotten Tomatoes Rating
+        /// </summary>
+        [BindProperty]
+        public double? RTMax { get; set; }
+
+        /// <summary>
+        /// Get search results for page
+        /// </summary>
+        /// <param name="IMDBMin"></param>
+        /// <param name="IMDBMax"></param>
+        /// <param name="RTMin"></param>
+        /// <param name="RTMax"></param>
+        public void OnGet(double? IMDBMin, double? IMDBMax, double? RTMin, double? RTMax)
         {
-            SearchTerms = Request.Query["SearchTerms"];
-            MPAARatings = Request.Query["MPAARatings"];
+            this.IMDBMin = IMDBMin;
+            this.IMDBMax = IMDBMax;
+            this.RTMin = RTMin;
+            this.RTMax = RTMax;
             Movies = MovieDatabase.Search(SearchTerms);
             Movies = MovieDatabase.FilterByMPAARating(Movies, MPAARatings);
+            Movies = MovieDatabase.FilterByGenre(Movies, Genres);
+            Movies = MovieDatabase.FilterByIMDBRating(Movies, IMDBMin, IMDBMax);
+            Movies = MovieDatabase.FilterByRTRating(Movies, RTMin, RTMax);
         }
     }
 }

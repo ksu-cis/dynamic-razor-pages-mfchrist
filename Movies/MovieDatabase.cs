@@ -25,23 +25,22 @@ namespace Movies
         /// <summary>
         /// Loads the movie database from the JSON file
         /// </summary>
-        static MovieDatabase() {
-            
+        static MovieDatabase()
+        {
             using (StreamReader file = System.IO.File.OpenText("movies.json"))
             {
                 string json = file.ReadToEnd();
                 movies = JsonConvert.DeserializeObject<List<Movie>>(json);
-            }
-
-            HashSet<string> genreSet = new HashSet<string>();
-            foreach (Movie movie in movies)
-            {
-                if (movie.MajorGenre != null)
+                HashSet<string> genreSet = new HashSet<string>();
+                foreach (Movie movie in movies)
                 {
-                    genreSet.Add(movie.MajorGenre);
+                    if (movie.MajorGenre != null)
+                    {
+                        genreSet.Add(movie.MajorGenre);
+                    }
                 }
+                genres = genreSet.ToArray();
             }
-            genres = genreSet.ToArray();
         }
 
         /// <summary>
@@ -56,18 +55,21 @@ namespace Movies
         /// <returns>A collection of movies</returns>
         public static IEnumerable<Movie> Search(string terms)
         {
+            // TODO: Search database
             List<Movie> results = new List<Movie>();
+
             // Return all movies if there are no search terms
             if (terms == null) return All;
+
             // return each movie in the database containing the terms substring
             foreach (Movie movie in All)
             {
-                if (movie.Title.Contains(terms, StringComparison.InvariantCultureIgnoreCase))
+                if (movie.Title != null && movie.Title.Contains(terms, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (movie.Title != null && movie.Title.Contains(terms, StringComparison.InvariantCultureIgnoreCase))
-                        results.Add(movie);
+                    results.Add(movie);
                 }
             }
+
             return results;
         }
 
@@ -96,6 +98,7 @@ namespace Movies
         {
             // If no filter is specified, just return the provided collection
             if (ratings == null || ratings.Count() == 0) return movies;
+
             // Filter the supplied collection of movies
             List<Movie> results = new List<Movie>();
             foreach (Movie movie in movies)
@@ -105,12 +108,13 @@ namespace Movies
                     results.Add(movie);
                 }
             }
+
             return results;
         }
 
         /// <summary>
         /// Filters the provided collection of movies 
-        /// to those with IMDB ratings falling within 
+        /// by IMDB ratings falling within 
         /// the specified range
         /// </summary>
         /// <param name="movies">The collection of movies to filter</param>
@@ -120,9 +124,10 @@ namespace Movies
         public static IEnumerable<Movie> FilterByIMDBRating(IEnumerable<Movie> movies, double? min, double? max)
         {
             if (min == null && max == null) return movies;
+
             var results = new List<Movie>();
 
-            // only a maximum specified
+            // Only a maximum specified
             if (min == null)
             {
                 foreach (Movie movie in movies)
@@ -131,7 +136,8 @@ namespace Movies
                 }
                 return results;
             }
-            // only a minimum specified 
+
+            // Only a minimum specified 
             if (max == null)
             {
                 foreach (Movie movie in movies)
@@ -140,6 +146,7 @@ namespace Movies
                 }
                 return results;
             }
+
             // Both minimum and maximum specified
             foreach (Movie movie in movies)
             {
@@ -150,6 +157,78 @@ namespace Movies
             }
             return results;
         }
+
+        /// <summary>
+        /// Filters the provided collection of movies 
+        /// by RT ratings falling within 
+        /// the specified range
+        /// </summary>
+        /// <param name="movies">The movies to filter</param>
+        /// <param name="min">The minimum range value</param>
+        /// <param name="max">The maximum range value</param>
+        /// <returns>The filtered movie collection</returns>
+        public static IEnumerable<Movie> FilterByRTRating(IEnumerable<Movie> movies, double? min, double? max)
+        {
+            if (min == null && max == null) return movies;
+
+            var results = new List<Movie>();
+
+            // Only a maximum specified
+            if (min == null)
+            {
+                foreach (Movie movie in movies)
+                {
+                    if (movie.RottenTomatoesRating <= max) results.Add(movie);
+                }
+                return results;
+            }
+
+            // Only a minimum specified 
+            if (max == null)
+            {
+                foreach (Movie movie in movies)
+                {
+                    if (movie.RottenTomatoesRating >= min) results.Add(movie);
+                }
+                return results;
+            }
+
+            // Both minimum and maximum specified
+            foreach (Movie movie in movies)
+            {
+                if (movie.RottenTomatoesRating >= min && movie.RottenTomatoesRating <= max)
+                {
+                    results.Add(movie);
+                }
+            }
+            return results;
+        }
+
+
+        /// <summary>
+        /// Filters the provided collection of movies by genre
+        /// </summary>
+        /// <param name="movies">The movies to filter</param>
+        /// <param name="genres"> The genres to include</param>
+        /// <returns></returns>
+        public static IEnumerable<Movie> FilterByGenre(IEnumerable<Movie> movies, IEnumerable<string> genres)
+        {
+            // If no filter is specified, just return the provided collection
+            if (genres == null || genres.Count() == 0) return movies;
+
+            // Filter the supplied collection of movies
+            List<Movie> results = new List<Movie>();
+            foreach (Movie movie in movies)
+            {
+                if (movie.MajorGenre != null && genres.Contains(movie.MajorGenre))
+                {
+                    results.Add(movie);
+                }
+            }
+
+            return results;
+        }
+
 
     }
 }
