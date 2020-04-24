@@ -66,7 +66,7 @@ namespace Movies.Pages
         [BindProperty]
         public double? RTMax { get; set; }
 
-        /// <summary>
+        /// <summary> 
         /// Get search results for page
         /// </summary>
         /// <param name="IMDBMin"></param>
